@@ -1,0 +1,11 @@
+repositories {
+    jcenter()
+}
+
+allprojects {
+  apply plugin: 'base'
+}
+
+task wrapper(type: Wrapper){
+  gradleVersion = '2.12'
+}

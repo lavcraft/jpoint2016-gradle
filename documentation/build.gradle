@@ -1,0 +1,85 @@
+plugins {
+  id 'org.asciidoctor.convert' version '1.5.3'
+}
+
+configurations {
+  docs
+}
+//asciidoctor {
+//  String content = "The content of the URL " + System.currentTimeMillis()
+//    extensions {
+//      include_processor(filter: { it.startsWith('http') }) {
+//        document, reader, target, attributes ->
+//          reader.push_include(content, target, target, 1, attributes);
+//      }
+//    }
+//}
+
+apply plugin: 'org.asciidoctor.convert'
+
+List<String> docsSources = fileTree(dir: projectDir, include: '**/*.adoc')
+    .toList() // hack for ruby. Prevent NoSuchMethodException exception
+    .collect { relativePath(it) }
+
+asciidoctorj {
+  version = '1.5.0'
+//  groovyDslVersion = '1.0.0.Alpha1'
+}
+
+asciidoctor {
+  sourceDir project.projectDir
+
+  sources {
+    setIncludes docsSources
+  }
+
+  outputDir = new File("$buildDir/docs")
+  attributes(['source-highlighter': 'coderay',
+              doctype             : 'book',
+              toc                 : 'left',
+              idprefix            : '',
+              idseparator         : '-'])
+
+//  String content = "The content of the URL " + System.currentTimeMillis()
+//    extensions {
+//      include_processor(filter: { it.startsWith('http') }) {
+//        document, reader, target, attributes ->
+//          reader.push_include(content, target, target, 1, attributes);
+//      }
+//    }
+}
+
+dependencies {
+//  asciidoctor 'org.codehaus.groovy:groovy-all:2.4.4'
+//  asciidoctor 'org.jruby:jruby-complete:9.0.5.0'
+//  asciidoctor project(':extension')
+}
+
+dependencies {
+  docs project(path: ':service-with-deps', configuration: 'documentationConfiguration')
+}
+
+task copyDist(type: Copy) {
+  into "$buildDir/docsArchive"
+  from configurations.docs
+}
+
+task prepare(type: Copy) {
+  dependsOn copyDist
+  into "$buildDir/docsDependencies/"
+  configurations.docs.files.each { archive ->
+    into(archive.name) {
+      from tarTree(archive)
+    }
+  }
+}
+
+task dist(type: Tar) {
+  dependsOn 'asciidoctor'
+  compression 'gzip'
+  from file(asciidoctor.outputDir)
+}
+
+artifacts {
+  documentationConfiguration dist
+}

@@ -1,11 +1,15 @@
-repositories {
-    jcenter()
-}
-
-allprojects {
+allprojects { p ->
   apply plugin: 'base'
+
+  repositories {
+    jcenter()
+  }
+
+  configurations {
+    documentationConfiguration
+  }
 }
 
-task wrapper(type: Wrapper){
+task wrapper(type: Wrapper) {
   gradleVersion = '2.12'
 }

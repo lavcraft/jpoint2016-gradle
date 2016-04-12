@@ -1,0 +1,12 @@
+task dist(type: Tar) {
+    compression 'gzip'
+    from fileTree(dir: file('src/docs/'), include: '**/*.adoc')
+}
+
+dependencies {
+    documentationConfiguration project(path: ':service', configuration: 'documentationConfiguration')
+}
+
+artifacts {
+    documentationConfiguration dist
+}

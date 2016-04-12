@@ -1,0 +1,12 @@
+= Самая главная документация
+
+В этом документе описано как быть самым главным и важным документом в мире разнообразных документов
+
+include::https://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[]
+
+include::gradle://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[]
+
+[BIG]
+sfdsfdfdsfsd sdf  sd
+
+include::../support.adoc[]

@@ -22,7 +22,6 @@ class DependencyIncludeProcessor extends IncludeProcessor {
 
   @Override
   void process(DocumentRuby document, PreprocessorReader reader, String target, Map<String, Object> attributes) {
-
     def dependencies = project.configurations.docs.collect {
       project.zipTree(it).collect {
         it.readLines()

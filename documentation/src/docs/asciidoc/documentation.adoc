@@ -4,7 +4,7 @@
 
 include::https://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[]
 
-include::gradle://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[]
+include::gradle://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[vars=232,321]
 
 [BIG]
 sfdsfdfdsfsd sdf  sd

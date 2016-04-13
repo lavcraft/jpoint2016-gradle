@@ -1,5 +1,4 @@
-task dist(type: Tar) {
-    compression 'gzip'
+task dist(type: Zip) {
     from fileTree(dir: file('src/docs/'), include: '**/*.adoc')
 }
 

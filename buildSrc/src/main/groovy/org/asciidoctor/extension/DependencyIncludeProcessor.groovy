@@ -11,6 +11,10 @@ class DependencyIncludeProcessor extends IncludeProcessor {
   //TODO WTF .. we need to avoid static project set... However, maybe it is right way :)
   static Project project
 
+  DependencyIncludeProcessor() {
+    super([:])
+  }
+
   public DependencyIncludeProcessor(Map<String, Object> config) {
     super(config)
   }
@@ -27,7 +31,7 @@ class DependencyIncludeProcessor extends IncludeProcessor {
       project.zipTree(it).collect {
         it.readLines()
       }
-    }
+    }.flatten().join '\n\n'
 
     String s = """
     time:            ${System.currentTimeMillis()}
@@ -35,7 +39,9 @@ class DependencyIncludeProcessor extends IncludeProcessor {
     document:        $document
     target:          $target
     attributes:      $attributes
-    dependencies:    $dependencies
+    dependencies:
+
+$dependencies
     """
 
     reader.push_include(s, target, target, 1, attributes)

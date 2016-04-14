@@ -1,3 +1,5 @@
+import ru.jpoint.plugin.DocumentationPlugin
+
 buildscript {
   repositories { jcenter() }
   dependencies {
@@ -5,15 +7,12 @@ buildscript {
   }
 }
 
-plugins {
-  id 'org.asciidoctor.convert' version '1.5.3'
-}
-
 configurations {
   docs
 }
 
 apply plugin: 'org.asciidoctor.convert'
+apply plugin: DocumentationPlugin
 
 
 task tt(dependsOn: configurations.docs) {
@@ -49,10 +48,6 @@ asciidoctor {
               toc                 : 'left',
               idprefix            : '',
               idseparator         : '-'])
-
-  afterEvaluate {
-    org.asciidoctor.extension.DependencyIncludeProcessor.project = project
-  }
 }
 
 dependencies {

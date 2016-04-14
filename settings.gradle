@@ -4,4 +4,5 @@ include 'service'
 include 'documentation'
 include 'service-with-deps'
 //include 'extension'
+include 'plugin'
 

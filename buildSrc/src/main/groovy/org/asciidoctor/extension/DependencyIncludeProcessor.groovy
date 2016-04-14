@@ -36,7 +36,6 @@ class DependencyIncludeProcessor extends IncludeProcessor {
 
   @Override
   void process(DocumentRuby document, PreprocessorReader reader, String target, Map<String, Object> attributes) {
-
     def dependency = target.substring(target.indexOf(':') + 3)
     def split = dependency.split('/')
 

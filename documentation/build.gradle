@@ -15,9 +15,17 @@ configurations {
 
 apply plugin: 'org.asciidoctor.convert'
 
-List<String> docsSources = fileTree(dir: projectDir, include: '**/*.adoc')
-    .toList() // hack for ruby. Prevent NoSuchMethodException exception
-    .collect { relativePath(it) }
+
+task tt(dependsOn: configurations.docs) {
+  doLast {
+    Map deps = new HashMap()
+
+    configurations.docs.resolvedConfiguration.resolvedArtifacts.each {
+      println it.getModuleVersion().getId()
+      deps.put(it.getModuleVersion().getId(), it)
+    }
+  }
+}
 
 asciidoctorj {
   version = '1.5.4'
@@ -25,6 +33,9 @@ asciidoctorj {
 }
 
 asciidoctor {
+  List<String> docsSources = fileTree(dir: projectDir, include: '**/*.adoc')
+      .toList() // hack for ruby. Prevent NoSuchMethodException exception
+      .collect { relativePath(it) }
   dependsOn 'prepare'
   sourceDir project.projectDir
 
@@ -47,6 +58,7 @@ asciidoctor {
 dependencies {
   asciidoctor 'org.asciidoctor:asciidoctorj:1.5.4'
   docs project(path: ':service-with-deps', configuration: 'documentationConfiguration')
+  docs 'org.slf4j:slf4j-api:1.7.2'
 }
 
 task copyDist(type: Copy) {

@@ -4,7 +4,9 @@
 
 include::https://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[]
 
-include::gradle://raw.github.com/asciidoctor/asciidoctor/master/Gemfile[vars=232,321]
+include::gradle://:service/service.adoc[type=project]
+include::gradle://:service/serviceNotFound.adoc[type=project]
+include::gradle://gradle-advanced:service-with-deps:unspecified/deps.adoc[type=external]
 
 [BIG]
 sfdsfdfdsfsd sdf  sd

@@ -2,6 +2,9 @@ package org.asciidoctor.extension
 
 import org.asciidoctor.ast.DocumentRuby
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ResolvedArtifact
+
+import java.time.ZonedDateTime
 
 /**
  * @author tolkv
@@ -10,6 +13,7 @@ import org.gradle.api.Project
 class DependencyIncludeProcessor extends IncludeProcessor {
   //TODO WTF .. we need to avoid static project set... However, maybe it is right way :)
   static Project project
+  private Map<String, ResolvedArtifact> deps = new HashMap()
 
   DependencyIncludeProcessor() {
     super([:])
@@ -17,6 +21,12 @@ class DependencyIncludeProcessor extends IncludeProcessor {
 
   public DependencyIncludeProcessor(Map<String, Object> config) {
     super(config)
+
+    project.configurations.docs.resolvedConfiguration.resolvedArtifacts.each {
+//      println it.getModuleVersion().getId()
+      deps.put(it.getModuleVersion().getId().toString(), it)
+    }
+
   }
 
   @Override
@@ -27,21 +37,51 @@ class DependencyIncludeProcessor extends IncludeProcessor {
   @Override
   void process(DocumentRuby document, PreprocessorReader reader, String target, Map<String, Object> attributes) {
 
-    def dependencies = project.configurations.docs.collect {
-      project.zipTree(it).collect {
-        it.readLines()
+    def dependency = target.substring(target.indexOf(':') + 3)
+    def split = dependency.split('/')
+
+    def dependencyName = split[0]
+    def dependencyInsideFileName = split[1]
+
+    String content
+    if (dependencyName.startsWith(':')) {
+      def artifact = project.configurations.docs.resolvedConfiguration.resolvedArtifacts.find {
+        it.moduleVersion.id.name == dependencyName.replace(':', '')
       }
-    }.flatten().join '\n\n'
+
+      if (!artifact) {
+        project.logger.warn 'File {} has not found in dependency {}', dependencyInsideFileName, dependencyName
+        return
+      }
+
+      File fileWithTargetContent = project.zipTree(artifact.file).find { File file ->
+        file.name == dependencyInsideFileName
+      } as File
+
+      if (!fileWithTargetContent) {
+        project.logger.warn 'File {} has not found in dependency {}', dependencyInsideFileName, dependencyName
+        return
+      } else {
+        content = fileWithTargetContent.text
+      }
+    } else {
+      content = project.configurations.docs.take(1).collect {
+        project.zipTree(it).collect {
+          it.readLines()
+        }
+      }.flatten().join '\n\n'
+    }
 
     String s = """
-    time:            ${System.currentTimeMillis()}
-    project:         ${project?.name}
-    document:        $document
-    target:          $target
-    attributes:      $attributes
+    time:                     ${ZonedDateTime.now()}
+    project:                  ${project?.name}
+    document:                 $document
+    dependencyName:           $dependencyName
+    dependencyInsideFileName: $dependencyInsideFileName
+    attributes:               $attributes
     dependencies:
 
-$dependencies
+$content
     """
 
     reader.push_include(s, target, target, 1, attributes)

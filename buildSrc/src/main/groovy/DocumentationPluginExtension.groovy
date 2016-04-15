@@ -9,6 +9,11 @@ class DocumentationPluginExtension {
   String documentationSourceConfigurationName = DocumentationPlugin.DOCUMENTATION_DOCS_CONFIGURATION_NAME
   String documentationDistTaskName = DocumentationPlugin.DOCUMENTATION_DIST_TASK_NAME
 
+  /**
+   * enable/disable rich logging
+   */
+  boolean debug
+
   final Project project
 
   DocumentationPluginExtension(Project project) {

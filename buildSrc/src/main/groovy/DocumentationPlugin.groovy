@@ -52,6 +52,7 @@ class DocumentationPlugin implements Plugin<Project> {
           "$extension.documentationConfigurationName" dTask
         }
 
+        project.dependencies.createArtifactResolutionQuery()
         plugins.withType(AsciidoctorPlugin) {
 //шаг 3, а почему нам и asciidoctorj не вынести сюда?
           asciidoctorj {
@@ -61,6 +62,8 @@ class DocumentationPlugin implements Plugin<Project> {
           project.tasks.withType(AsciidoctorTask) { task ->
             doFirst {
               DependencyIncludeProcessor.project = project
+//шаг 4, а почему не дать пользователям делать отладочный рендеринг?
+              DependencyIncludeProcessor.debug = extension.debug
             }
 
             mustRunAfter extension.documentationDistTaskName

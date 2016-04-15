@@ -12,6 +12,7 @@ import java.time.ZonedDateTime
 class DependencyIncludeProcessor extends IncludeProcessor {
   //TODO WTF .. we need to avoid static project set... However, maybe it is right way :)
   public static Project project
+  public static boolean debug
 
   DependencyIncludeProcessor() {
     super([:])
@@ -73,7 +74,9 @@ class DependencyIncludeProcessor extends IncludeProcessor {
       content = fileWithTargetContent.text
     }
 
-    String metadataWithContent = """
+    String metadataWithContent
+    if (debug) {
+      metadataWithContent = """
     time:                     ${ZonedDateTime.now()}
     project:                  ${project?.name}
     document:                 $document
@@ -84,6 +87,10 @@ class DependencyIncludeProcessor extends IncludeProcessor {
 
 $content
     """
+    } else {
+      metadataWithContent = content
+    }
+
     reader.push_include(metadataWithContent, target, target, 1, attributes)
   }
 }

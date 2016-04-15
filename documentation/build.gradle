@@ -8,6 +8,10 @@ buildscript {
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: DocumentationPlugin
 
+docs {
+  debug = true
+}
+
 dependencies {
   asciidoctor 'org.asciidoctor:asciidoctorj:1.5.4'
   docs project(path: ':service-with-deps', configuration: 'documentationConfiguration')

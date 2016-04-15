@@ -1,5 +1,3 @@
-import ru.jpoint.plugin.DocumentationPlugin
-
 buildscript {
   repositories { jcenter() }
   dependencies {
@@ -7,48 +5,8 @@ buildscript {
   }
 }
 
-configurations {
-  docs
-}
-
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: DocumentationPlugin
-
-
-task tt(dependsOn: configurations.docs) {
-  doLast {
-    Map deps = new HashMap()
-
-    configurations.docs.resolvedConfiguration.resolvedArtifacts.each {
-      println it.getModuleVersion().getId()
-      deps.put(it.getModuleVersion().getId(), it)
-    }
-  }
-}
-
-asciidoctorj {
-  version = '1.5.4'
-  groovyDslVersion = '1.0.0.Alpha1'
-}
-
-asciidoctor {
-  List<String> docsSources = fileTree(dir: projectDir, include: '**/*.adoc')
-      .toList() // hack for ruby. Prevent NoSuchMethodException exception
-      .collect { relativePath(it) }
-  dependsOn 'prepare'
-  sourceDir project.projectDir
-
-  sources {
-    setIncludes docsSources
-  }
-
-  outputDir = new File("$buildDir/docs")
-  attributes(['source-highlighter': 'coderay',
-              doctype             : 'book',
-              toc                 : 'left',
-              idprefix            : '',
-              idseparator         : '-'])
-}
 
 dependencies {
   asciidoctor 'org.asciidoctor:asciidoctorj:1.5.4'
@@ -56,27 +14,11 @@ dependencies {
   docs 'org.slf4j:slf4j-api:1.7.2'
 }
 
-task copyDist(type: Copy) {
-  into "$buildDir/docsArchive"
-  from configurations.docs
-}
-
 task prepare(type: Copy) {
-  dependsOn copyDist
   into "$buildDir/docsDependencies/"
   configurations.docs.files.each { archive ->
-    into(archive.name) {
+    into(archive.name - '.zip') {
       from zipTree(archive)
     }
   }
-}
-
-task dist(type: Tar) {
-  dependsOn 'asciidoctor'
-  compression 'gzip'
-  from file(asciidoctor.outputDir)
-}
-
-artifacts {
-  documentationConfiguration dist
 }

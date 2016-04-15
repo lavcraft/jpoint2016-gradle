@@ -2,7 +2,6 @@ package org.asciidoctor.extension
 
 import org.asciidoctor.ast.DocumentRuby
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ResolvedArtifact
 
 import java.time.ZonedDateTime
 
@@ -12,8 +11,7 @@ import java.time.ZonedDateTime
  */
 class DependencyIncludeProcessor extends IncludeProcessor {
   //TODO WTF .. we need to avoid static project set... However, maybe it is right way :)
-  static Project project
-  private Map<String, ResolvedArtifact> deps = new HashMap()
+  public static Project project
 
   DependencyIncludeProcessor() {
     super([:])
@@ -21,12 +19,6 @@ class DependencyIncludeProcessor extends IncludeProcessor {
 
   public DependencyIncludeProcessor(Map<String, Object> config) {
     super(config)
-
-    project.configurations.docs.resolvedConfiguration.resolvedArtifacts.each {
-//      println it.getModuleVersion().getId()
-      deps.put(it.getModuleVersion().getId().toString(), it)
-    }
-
   }
 
   @Override
@@ -43,35 +35,45 @@ class DependencyIncludeProcessor extends IncludeProcessor {
     def dependencyInsideFileName = split[1]
 
     String content
-    if (dependencyName.startsWith(':')) {
-      def artifact = project.configurations.docs.resolvedConfiguration.resolvedArtifacts.find {
-        it.moduleVersion.id.name == dependencyName.replace(':', '')
-      }
 
-      if (!artifact) {
-        project.logger.warn 'File {} has not found in dependency {}', dependencyInsideFileName, dependencyName
-        return
-      }
+    def artifact = project.configurations.docs.resolvedConfiguration.resolvedArtifacts.find {
+      def version = it.moduleVersion.id
+      project.logger.debug """
+      dependencyName              $dependencyName
+      fileName                    $dependencyInsideFileName
+      it.moduleVersion.id.name    ${version.name}
+      it.moduleVersion.id.group   ${version.group}
+      it.moduleVersion.id.version ${version.version}
+      """.stripMargin().stripIndent()
 
-      File fileWithTargetContent = project.zipTree(artifact.file).find { File file ->
-        file.name == dependencyInsideFileName
-      } as File
-
-      if (!fileWithTargetContent) {
-        project.logger.warn 'File {} has not found in dependency {}', dependencyInsideFileName, dependencyName
-        return
-      } else {
-        content = fileWithTargetContent.text
+      if (dependencyName.startsWith(':'))
+        return version.name == dependencyName.replace(':', '')
+      else {
+        return dependencyName == version.toString()
       }
-    } else {
-      content = project.configurations.docs.take(1).collect {
-        project.zipTree(it).collect {
-          it.readLines()
-        }
-      }.flatten().join '\n\n'
     }
 
-    String s = """
+    if (!artifact) {
+      project.logger.warn 'Dependency {} not found', dependencyName
+      return
+    }
+    if (!artifact.file.exists()) {
+      project.logger.warn 'Dependency represented in file {} not found', artifact.file?.absolutePath
+      return
+    }
+
+    File fileWithTargetContent = project.zipTree(artifact.file).find {
+      it.name == dependencyInsideFileName
+    } as File
+
+    if (!fileWithTargetContent) {
+      project.logger.warn 'File {} has not found in dependency {}', dependencyInsideFileName, dependencyName
+      return
+    } else {
+      content = fileWithTargetContent.text
+    }
+
+    String metadataWithContent = """
     time:                     ${ZonedDateTime.now()}
     project:                  ${project?.name}
     document:                 $document
@@ -82,7 +84,6 @@ class DependencyIncludeProcessor extends IncludeProcessor {
 
 $content
     """
-
-    reader.push_include(s, target, target, 1, attributes)
+    reader.push_include(metadataWithContent, target, target, 1, attributes)
   }
 }

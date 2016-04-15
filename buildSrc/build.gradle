@@ -1,10 +1,10 @@
+apply plugin: 'java-gradle-plugin'
+
 repositories {
   jcenter()
 }
 
 dependencies {
-  compile localGroovy()
-  compile gradleApi()
   compile 'org.asciidoctor:asciidoctorj:1.5.4'
   compile 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
 }

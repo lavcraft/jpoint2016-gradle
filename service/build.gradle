@@ -1,1 +1,1 @@
-apply plugin: 'groovy'task dist(type: Zip) {  from fileTree(dir: file('src/docs/'), include: '**/*.adoc')}dependencies {  compile gradleApi()}artifacts {  documentationConfiguration dist}
+apply plugin: 'groovy'apply plugin: DocumentationPlugindependencies {  compile gradleApi()}

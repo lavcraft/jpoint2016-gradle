@@ -1,21 +1,14 @@
 apply plugin: 'maven-publish'
-
-task dist(type: Zip) {
-  from fileTree(dir: file('src/docs/'), include: '**/*.adoc')
-}
+apply plugin: DocumentationPlugin
 
 dependencies {
   documentationConfiguration project(path: ':service', configuration: 'documentationConfiguration')
 }
 
-artifacts {
-  documentationConfiguration dist
-}
-
 publishing {
   publications {
     docs(MavenPublication) {
-      artifact dist
+      artifact documentationDistZip
     }
   }
 }

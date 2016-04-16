@@ -1,5 +1,6 @@
 apply plugin: 'maven-publish'
 apply plugin: DocumentationPlugin
+apply plugin: DocumentationRules
 
 dependencies {
   documentationConfiguration project(path: ':service', configuration: 'documentationConfiguration')
@@ -11,4 +12,8 @@ publishing {
       artifact documentationDistZip
     }
   }
+}
+
+model {
+  documentation(Documentation)
 }

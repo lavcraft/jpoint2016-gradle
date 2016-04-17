@@ -2,6 +2,8 @@ allprojects { p ->
   repositories {
     jcenter()
   }
+
+  apply plugin: 'idea'
 }
 
 task wrapper(type: Wrapper) {

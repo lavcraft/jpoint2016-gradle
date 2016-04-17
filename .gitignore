@@ -6,6 +6,8 @@ hs_err_pid*
 ### JetBrains template
 .idea
 *.iws
+*.iml
+*.ipr
 
 ### Gradle template
 .gradle

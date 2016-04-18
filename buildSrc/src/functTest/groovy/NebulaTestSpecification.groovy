@@ -19,7 +19,7 @@ class NebulaTestSpecification extends IntegrationSpec {
 """
     }
 
-    def "execution of documentation distribution task is up to date"() {
+    def "execution of documentation distribution task is success"() {
         when:
         buildFile << """
             docs {
@@ -31,9 +31,10 @@ class NebulaTestSpecification extends IntegrationSpec {
               docs 'org.slf4j:slf4j-api:1.7.2'
             }
 """
+        createFile('src/docs/asciidoc/documentation.adoc')
         ExecutionResult result = runTasksSuccessfully('documentationDistZip')
 
         then:
-        result.wasUpToDate('documentationDistZip')
+        result.wasExecuted('documentationDistZip')
     }
 }

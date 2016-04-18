@@ -2,11 +2,8 @@ allprojects { p ->
   apply plugin: 'base'
 
   repositories {
+    mavenLocal()
     jcenter()
-  }
-
-  configurations {
-    documentationConfiguration
   }
 }
 

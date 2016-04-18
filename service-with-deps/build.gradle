@@ -4,12 +4,16 @@ task dist(type: Zip) {
   from fileTree(dir: file('src/docs/'), include: '**/*.adoc')
 }
 
+configurations { //TODO #2 add configuration to all projects
+  documentationConfiguration
+}
+
 dependencies {
   documentationConfiguration project(path: ':service', configuration: 'documentationConfiguration')
 }
 
 artifacts {
-  documentationConfiguration dist
+  documentationConfiguration dist //TODO #3 add artifacts to all projects
 }
 
 publishing {

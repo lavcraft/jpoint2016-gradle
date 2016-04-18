@@ -27,7 +27,7 @@ class TestSpecification extends Specification {
                 .collect { new File(it) }
     }
 
-    def "full cycle test"() {
+    def "execution of documentation distribution task is up to date"() {
         given:
         def classpathString = pluginClasspath
                 .collect { it.absolutePath.replace('\\', '\\\\') } // escape backslashes in Windows paths
